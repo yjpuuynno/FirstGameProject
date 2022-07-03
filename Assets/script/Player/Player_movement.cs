@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player_movement : MonoBehaviour
 {
     [HideInInspector]
-    public Rigidbody2D rigidbody2D;
+    public Rigidbody2D rb;
     Player_collider pCollider;
     Player_input pInput;
 
@@ -20,10 +20,10 @@ public class Player_movement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         pCollider = GetComponent<Player_collider>();
         pInput = GetComponent<Player_input>();
-        rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
     // Update is called once per frame
@@ -45,11 +45,11 @@ public class Player_movement : MonoBehaviour
         */
         float velPower = 1f;
         float pSpeed = moveInput * moveSpeed;
-        float speedDif = pSpeed - rigidbody2D.velocity.x;
+        float speedDif = pSpeed - rb.velocity.x;
         float accelRate = (Mathf.Abs(pSpeed)>0.01f) ? acceleration : decceleration;
         float movement = Mathf.Pow(Mathf.Abs(speedDif)*accelRate , velPower) *Mathf.Sign(speedDif);
 
-        rigidbody2D.AddForce(movement * Vector2.right);
+        rb.AddForce(movement * Vector2.right);
     }
     void Jump()//점프한다
     {/*
