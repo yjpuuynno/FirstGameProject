@@ -12,11 +12,16 @@ public class Player_movement : MonoBehaviour
     [Space]
     [Header("Input")]
     private float moveInput;
+    private float jumpInput;
     [Space]
     [Header("Stats")]
     public float moveSpeed = 10;
     public float acceleration = 5;
     public float decceleration = 5;
+    public float jumpForce = 1;
+    [Space]
+    [Header("BoolStats")]
+    public bool isJumping = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,19 +35,26 @@ public class Player_movement : MonoBehaviour
     void Update()
     {
         moveInput = pInput.xRaw;
+        jumpInput = pInput.yRaw;
+        if(isJumping && rb.velocity.y < 0)
+        {
+            isJumping = false;
+        }
     }
 
     void FixedUpdate()
     {
         Walk();
+
+        if(jumpInput > 0)
+        {
+            Jump();    
+        }
+        jumpGravtity();
     }
 
     void Walk()//걷는다
-    {/*
-        if(현제속력<최대속력){
-        현제속력+=가속도;
-        }
-        */
+    {
         float velPower = 1f;
         float pSpeed = moveInput * moveSpeed;
         float speedDif = pSpeed - rb.velocity.x;
@@ -52,8 +64,24 @@ public class Player_movement : MonoBehaviour
         rb.AddForce(movement * Vector2.right);
     }
     void Jump()//점프한다
-    {/*
-        길게 누르면 조금 더 높게 점프 한다.
-        */
+    {
+        if(pCollider.onGround)
+        {
+            rb.AddForce(Vector2.up * jumpForce,ForceMode2D.Impulse);
+            isJumping = true;
+        }
+    }
+    void jumpGravtity()//낙하가속
+    {
+        float gravityScale=1;
+        float fallgravityMultiplier=2f;
+        if(rb.velocity.y < 0)
+        {
+            rb.gravityScale = gravityScale * fallgravityMultiplier;
+        }
+        else
+        {
+            rb.gravityScale = gravityScale;
+        }
     }
 }

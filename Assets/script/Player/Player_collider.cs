@@ -10,6 +10,10 @@ public class Player_collider : MonoBehaviour
     public float groundAngle;
     public Vector2 perp;
     public LayerMask groundLayer;
+
+    public bool onGround;
+    public Vector2 bottomOffset;
+    public Vector2 bottomSize;
     void Start()
     {
 
@@ -22,6 +26,7 @@ public class Player_collider : MonoBehaviour
     }
     void FixedUpdate()
     {
+        contactChk();
         ChkGroundAngle(RayHit());
     }
     RaycastHit2D RayHit()
@@ -30,9 +35,9 @@ public class Player_collider : MonoBehaviour
         RaycastHit2D hitDown = Physics2D.Raycast(chkPos.position,Vector2.down,distance,groundLayer);
         RaycastHit2D hitRight = Physics2D.Raycast(chkPos.position,Vector2.right,distance,groundLayer);
         RaycastHit2D hitLeft = Physics2D.Raycast(chkPos.position,Vector2.left,distance,groundLayer);
-        if(hitRight && groundAngle >= 90){
+        if(hitRight){
             nowHit = hitRight;
-        }else if(hitLeft && groundAngle >= 90)
+        }else if(hitLeft)
         {
             nowHit = hitLeft;
         }else
@@ -49,5 +54,14 @@ public class Player_collider : MonoBehaviour
         Debug.DrawLine(hit.point,hit.point+hit.normal,Color.red);
         Debug.DrawLine(hit.point,hit.point+perp,Color.red);
         Debug.DrawLine(chkPos.position,hit.point,Color.blue);
+    }
+    void contactChk()
+    {
+        onGround = Physics2D.OverlapBox((Vector2)transform.position + bottomOffset,bottomSize,0,groundLayer);
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube((Vector2)transform.position  + bottomOffset, bottomSize);
     }
 }
