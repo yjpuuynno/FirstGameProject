@@ -9,6 +9,7 @@ public class Player_collider : MonoBehaviour
     public float distance;
     public float groundAngle;
     public Vector2 perp;
+    public Vector2 groundVector;
     public LayerMask groundLayer;
 
     public bool onGround;
@@ -49,9 +50,9 @@ public class Player_collider : MonoBehaviour
     void ChkGroundAngle(RaycastHit2D hit)
     {
         groundAngle = Vector2.Angle(hit.normal,Vector2.up);
+        groundVector = Vector2.Reflect(hit.normal,Vector2.up);
         perp = Vector2.Perpendicular(hit.normal).normalized;
-
-        Debug.DrawLine(hit.point,hit.point+hit.normal,Color.red);
+        Debug.DrawLine(hit.point,hit.point+hit.normal,Color.green);
         Debug.DrawLine(hit.point,hit.point+perp,Color.red);
         Debug.DrawLine(chkPos.position,hit.point,Color.blue);
     }

@@ -792,6 +792,26 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
+  - first: {x: -15, y: -4, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 0
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: -14, y: -4, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 0
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
   - first: {x: -10, y: -4, z: 0}
     second:
       serializedVersion: 2
@@ -1007,6 +1027,16 @@ Tilemap:
       serializedVersion: 2
       m_TileIndex: 0
       m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: -15, y: -3, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 2
+      m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1804,12 +1834,12 @@ Tilemap:
       m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
-  - m_RefCount: 124
+  - m_RefCount: 126
     m_Data: {fileID: 11400000, guid: dd621650ff02eba4b898c435ecd0d35f, type: 2}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: 11400000, guid: bda087c8bcca06042aa2ad57cdb8bc86, type: 2}
   - m_RefCount: 3
     m_Data: {fileID: 11400000, guid: cc666fc35ffa31f45baa7eb76de33e2c, type: 2}
   - m_RefCount: 3
@@ -1827,12 +1857,12 @@ Tilemap:
   - m_RefCount: 3
     m_Data: {fileID: 11400000, guid: 782d254b27f35314cb7e721381d35db0, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 124
+  - m_RefCount: 126
     m_Data: {fileID: -5720202956136529497, guid: af7a558a7cefaee40a1ae374d06c8a61, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: 2417303172097939840, guid: af7a558a7cefaee40a1ae374d06c8a61, type: 3}
   - m_RefCount: 3
     m_Data: {fileID: 373140018850838248, guid: af7a558a7cefaee40a1ae374d06c8a61, type: 3}
   - m_RefCount: 3
@@ -1850,7 +1880,7 @@ Tilemap:
   - m_RefCount: 3
     m_Data: {fileID: -5040237362112878952, guid: af7a558a7cefaee40a1ae374d06c8a61, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 146
+  - m_RefCount: 149
     m_Data:
       e00: 1
       e01: 0
@@ -1869,7 +1899,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 146
+  - m_RefCount: 149
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -1989,6 +2019,24 @@ CompositeCollider2D:
         Y: -39999977
       - X: -100000108
         Y: -40000000
+      - X: -129999900
+        Y: -40000000
+      - X: -129999900
+        Y: -29999959
+      - X: -129999959
+        Y: -29999900
+      - X: -139999900
+        Y: -29999900
+      - X: -139999900
+        Y: -24999959
+      - X: -139999959
+        Y: -24999900
+      - X: -150000041
+        Y: -24999900
+      - X: -150000100
+        Y: -24999959
+      - X: -150000100
+        Y: -40000000
   m_CompositePaths:
     m_Paths:
     - - {x: 21.999971, y: -5}
@@ -2002,6 +2050,12 @@ CompositeCollider2D:
       - {x: -0.9999936, y: -3.9999921}
       - {x: -7.0000243, y: -1.0000099}
       - {x: -10.000022, y: -4}
+      - {x: -12.99999, y: -3.9999704}
+      - {x: -13.000026, y: -2.99999}
+      - {x: -13.99999, y: -2.9999607}
+      - {x: -14.000026, y: -2.49999}
+      - {x: -15.00001, y: -2.5000253}
+      - {x: -15.00004, y: -4}
       - {x: -21, y: -3.9999704}
       - {x: -20.999971, y: 4}
       - {x: 21, y: 3.9999704}
@@ -2110,10 +2164,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
-  moveSpeed: 10
-  acceleration: 5
+  moveSpeed: 5
+  acceleration: 4
   decceleration: 5
-  jumpForce: 1
+  jumpForce: 2
   isJumping: 0
 --- !u!114 &1753695059
 MonoBehaviour:
@@ -2131,6 +2185,7 @@ MonoBehaviour:
   distance: 0.5
   groundAngle: 0
   perp: {x: 0, y: 0}
+  groundVector: {x: 0, y: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

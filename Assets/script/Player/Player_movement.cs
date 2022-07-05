@@ -40,17 +40,18 @@ public class Player_movement : MonoBehaviour
         {
             isJumping = false;
         }
+        onJumpUp();
+        jumpGravtity();
     }
 
     void FixedUpdate()
     {
         Walk();
-
         if(jumpInput > 0)
         {
-            Jump();    
-        }
-        jumpGravtity();
+            Jump(Vector2.up);
+            isJumping = true; 
+        }   
     }
 
     void Walk()//걷는다
@@ -63,25 +64,35 @@ public class Player_movement : MonoBehaviour
 
         rb.AddForce(movement * Vector2.right);
     }
-    void Jump()//점프한다
+    void Jump(Vector2 dir)//점프한다
     {
         if(pCollider.onGround)
         {
-            rb.AddForce(Vector2.up * jumpForce,ForceMode2D.Impulse);
-            isJumping = true;
+            rb.AddForce(dir * jumpForce,ForceMode2D.Impulse);
         }
     }
     void jumpGravtity()//낙하가속
     {
         float gravityScale=1;
-        float fallgravityMultiplier=2f;
         if(rb.velocity.y < 0)
         {
-            rb.gravityScale = gravityScale * fallgravityMultiplier;
+            rb.gravityScale = gravityScale * 2;
         }
         else
         {
             rb.gravityScale = gravityScale;
+        }
+    }
+    void onJumpUp()//길게 누르면 더 높게점프
+    { 
+    float fallMultiplier = 2.5f;
+    float lowJumpMultiplier = 2f;
+        if(rb.velocity.y < 0)
+        {
+            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+        }else if(rb.velocity.y > 0 && jumpInput == 0)
+        {
+            rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
         }
     }
 }
