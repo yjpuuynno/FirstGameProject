@@ -18,13 +18,17 @@ public class Player_movement : MonoBehaviour
     public float moveSpeed = 5;
     public float acceleration = 4;
     public float decceleration = 5;
-    public float jumpForce = 2;
+    public float jumpForce;
+    [Range(0, 1)] public float jumpCutMultiplier;
+    [Range(0, 0.5f)] public float coyoteTime;
     [Space]
-    [Header("BoolStates")]
+    [Header("States")]
     public bool isJumping = false;
+    public float LastOnGroundTime ;
     [Space]
     [Header("const")]
     const int minimumJumpForce = 1;
+    const float defaultJumpForce = 2;
     // Start is called before the first frame update
     void Start()
     {
@@ -40,49 +44,53 @@ public class Player_movement : MonoBehaviour
         moveInput = pInput.xRaw;
         jumpInput = pInput.yRaw;
 
+        LastOnGroundTime-=Time.deltaTime;
+
         if(isJumping && rb.velocity.y < 0)
         {
             isJumping = false;
         }
 
-        if(pCollider.groundAngle != 0)//경사면에서는 평지보다 낮게 점프한다
+        if(pCollider.onGround)
         {
-            
-            jumpForce = (jumpForce / pCollider.groundAngle) + minimumJumpForce;
+            LastOnGroundTime = coyoteTime; 
         }
 
-        OnJumpUp();
-        jumpGravtity();
+        JumpGravtity();
     }
-
     void FixedUpdate()
     {
         Walk();
-        if(jumpInput > 0)
+        
+        if(jumpInput > 0 && CanJump())
         {
-            Jump(Vector2.up);           
-        }   
+            //OnJump();
+            isJumping = true;
+            Jump(Vector2.up);          
+        }
+        OnJumpUp();
     }
-
     void Walk()//걷는다
     {
         float velPower = 1f;
         float pSpeed = moveInput * moveSpeed;
         float speedDif = pSpeed - rb.velocity.x;
         float accelRate = (Mathf.Abs(pSpeed)>0.01f) ? acceleration : decceleration;
-        float movement = Mathf.Pow(Mathf.Abs(speedDif)*accelRate , velPower) *Mathf.Sign(speedDif);
+        float movement = Mathf.Pow(Mathf.Abs(speedDif)*accelRate , velPower) * Mathf.Sign(speedDif);
 
         rb.AddForce(movement * Vector2.right);
     }
+    //jump한다
     void Jump(Vector2 dir)//점프한다
-    {
-        isJumping = true; 
-        if(pCollider.onGround)
+    {       
+        float force = jumpForce;
+	    if (rb.velocity.y < 0)
         {
-            rb.AddForce(dir * jumpForce,ForceMode2D.Impulse);
+            force -= rb.velocity.y;
         }
+        rb.AddForce(dir * force,ForceMode2D.Impulse);
     }
-    void jumpGravtity()//낙하가속
+    void JumpGravtity()//낙하가속
     {
         float gravityScale=1;
         if(rb.velocity.y < 0)
@@ -96,14 +104,14 @@ public class Player_movement : MonoBehaviour
     }
     void OnJumpUp()//길게 누르면 더 높게점프
     { 
-    float fallMultiplier = 2.5f;
-    float lowJumpMultiplier = 2f;
-        if(rb.velocity.y < 0)
+        if(isJumping && rb.velocity.y > 0)
         {
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
-        }else if(rb.velocity.y > 0 && jumpInput == 0)
-        {
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+            isJumping=false;
+            rb.AddForce(Vector2.down * rb.velocity.y * (1 - jumpCutMultiplier), ForceMode2D.Impulse);
         }
+    }
+    public bool CanJump()
+    {
+        return LastOnGroundTime > 0 && !isJumping;
     }
 }
