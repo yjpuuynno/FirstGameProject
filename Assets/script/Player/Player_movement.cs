@@ -14,14 +14,17 @@ public class Player_movement : MonoBehaviour
     private float moveInput;
     private float jumpInput;
     [Space]
-    [Header("Stats")]
-    public float moveSpeed = 10;
-    public float acceleration = 5;
+    [Header("Status")]
+    public float moveSpeed = 5;
+    public float acceleration = 4;
     public float decceleration = 5;
-    public float jumpForce = 1;
+    public float jumpForce = 2;
     [Space]
-    [Header("BoolStats")]
+    [Header("BoolStates")]
     public bool isJumping = false;
+    [Space]
+    [Header("const")]
+    const int minimumJumpForce = 1;
     // Start is called before the first frame update
     void Start()
     {
@@ -36,11 +39,19 @@ public class Player_movement : MonoBehaviour
     {
         moveInput = pInput.xRaw;
         jumpInput = pInput.yRaw;
+
         if(isJumping && rb.velocity.y < 0)
         {
             isJumping = false;
         }
-        onJumpUp();
+
+        if(pCollider.groundAngle != 0)//경사면에서는 평지보다 낮게 점프한다
+        {
+            
+            jumpForce = (jumpForce / pCollider.groundAngle) + minimumJumpForce;
+        }
+
+        OnJumpUp();
         jumpGravtity();
     }
 
@@ -49,8 +60,7 @@ public class Player_movement : MonoBehaviour
         Walk();
         if(jumpInput > 0)
         {
-            Jump(Vector2.up);
-            isJumping = true; 
+            Jump(Vector2.up);           
         }   
     }
 
@@ -66,6 +76,7 @@ public class Player_movement : MonoBehaviour
     }
     void Jump(Vector2 dir)//점프한다
     {
+        isJumping = true; 
         if(pCollider.onGround)
         {
             rb.AddForce(dir * jumpForce,ForceMode2D.Impulse);
@@ -83,7 +94,7 @@ public class Player_movement : MonoBehaviour
             rb.gravityScale = gravityScale;
         }
     }
-    void onJumpUp()//길게 누르면 더 높게점프
+    void OnJumpUp()//길게 누르면 더 높게점프
     { 
     float fallMultiplier = 2.5f;
     float lowJumpMultiplier = 2f;
