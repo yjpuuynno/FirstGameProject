@@ -9,10 +9,20 @@ public class Player_movement : MonoBehaviour
     Player_collider pCollider;
     Player_input pInput;
 
+    #region STATE PARAMETERS
+    public bool isJumping { get; private set; }
+    public float LastOnGroundTime { get; private set; }
+    #endregion
+
+    #region INPUT PARAMETERS
+	public float LastPressedJumpTime { get; private set; }
+	#endregion
+
     [Space]
     [Header("Input")]
     private float moveInput;
     private float jumpInput;
+
     [Space]
     [Header("Status")]
     public float moveSpeed = 5;
@@ -21,10 +31,7 @@ public class Player_movement : MonoBehaviour
     public float jumpForce;
     [Range(0, 1)] public float jumpCutMultiplier;
     [Range(0, 0.5f)] public float coyoteTime;
-    [Space]
-    [Header("States")]
-    public bool isJumping = false;
-    public float LastOnGroundTime ;
+
     [Space]
     [Header("const")]
     const int minimumJumpForce = 1;
@@ -36,27 +43,39 @@ public class Player_movement : MonoBehaviour
         pCollider = GetComponent<Player_collider>();
         pInput = GetComponent<Player_input>();
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+        #region SETUP INPUTS
+        #endregion
     }
 
     // Update is called once per frame
     void Update()
     {
-        moveInput = pInput.xRaw;
-        jumpInput = pInput.yRaw;
+        moveInput = pInput.movementInput.x;
+        jumpInput = pInput.movementInput.y;
 
+        #region TIMERS
         LastOnGroundTime-=Time.deltaTime;
+        #endregion
 
-        if(isJumping && rb.velocity.y < 0)
-        {
-            isJumping = false;
-        }
-
+        #region PHYSICS CHECKS
+        //Player_colider.cs
         if(pCollider.onGround)
         {
             LastOnGroundTime = coyoteTime; 
         }
+        #endregion
 
+        #region GRAVITY
         JumpGravtity();
+        #endregion
+
+        #region JUMP CHECKS
+        if(isJumping && rb.velocity.y < 0)
+        {
+            isJumping = false;
+        } 
+        #endregion
     }
     void FixedUpdate()
     {
@@ -64,12 +83,13 @@ public class Player_movement : MonoBehaviour
         
         if(jumpInput > 0 && CanJump())
         {
-            //OnJump();
             isJumping = true;
             Jump(Vector2.up);          
         }
-        OnJumpUp();
+        JumpCut();
     }
+
+    #region BEHAVIOR
     void Walk()//걷는다
     {
         float velPower = 1f;
@@ -77,12 +97,10 @@ public class Player_movement : MonoBehaviour
         float speedDif = pSpeed - rb.velocity.x;
         float accelRate = (Mathf.Abs(pSpeed)>0.01f) ? acceleration : decceleration;
         float movement = Mathf.Pow(Mathf.Abs(speedDif)*accelRate , velPower) * Mathf.Sign(speedDif);
-
         rb.AddForce(movement * Vector2.right);
     }
-    //jump한다
     void Jump(Vector2 dir)//점프한다
-    {       
+    {
         float force = jumpForce;
 	    if (rb.velocity.y < 0)
         {
@@ -90,6 +108,19 @@ public class Player_movement : MonoBehaviour
         }
         rb.AddForce(dir * force,ForceMode2D.Impulse);
     }
+    #endregion
+
+    #region ACTIONABLE
+    public bool CanJump()
+    {
+        return LastOnGroundTime > 0 && !isJumping;
+    }
+    private bool CanJumpCut()
+    {
+		return isJumping && rb.velocity.y > 0;
+    }
+    #endregion
+
     void JumpGravtity()//낙하가속
     {
         float gravityScale=1;
@@ -102,16 +133,12 @@ public class Player_movement : MonoBehaviour
             rb.gravityScale = gravityScale;
         }
     }
-    void OnJumpUp()//길게 누르면 더 높게점프
+    void JumpCut()//길게 누르면 더 높게점프
     { 
-        if(isJumping && rb.velocity.y > 0)
+        if(CanJumpCut())
         {
             isJumping=false;
             rb.AddForce(Vector2.down * rb.velocity.y * (1 - jumpCutMultiplier), ForceMode2D.Impulse);
         }
-    }
-    public bool CanJump()
-    {
-        return LastOnGroundTime > 0 && !isJumping;
     }
 }
