@@ -43,9 +43,6 @@ public class Player_movement : MonoBehaviour
         pCollider = GetComponent<Player_collider>();
         pInput = GetComponent<Player_input>();
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-
-        #region SETUP INPUTS
-        #endregion
     }
 
     // Update is called once per frame
@@ -66,7 +63,7 @@ public class Player_movement : MonoBehaviour
         }
         #endregion
 
-        #region GRAVITY
+        #region GRAVITY CHECKS
         JumpGravtity();
         #endregion
 
