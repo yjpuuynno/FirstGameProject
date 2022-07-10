@@ -11,6 +11,7 @@ public class Player_movement : MonoBehaviour
 
     #region STATE PARAMETERS
     public bool isJumping { get; private set; }
+    public bool isHanging { get; private set; }
     public float LastOnGroundTime { get; private set; }
     #endregion
 
@@ -31,6 +32,7 @@ public class Player_movement : MonoBehaviour
     public float jumpForce;
     [Range(0, 1)] public float jumpCutMultiplier;
     [Range(0, 0.5f)] public float coyoteTime;
+    [Range(0, 1)] public float HangingMultiplier;
 
     [Space]
     [Header("const")]
@@ -67,23 +69,35 @@ public class Player_movement : MonoBehaviour
         JumpGravtity();
         #endregion
 
-        #region JUMP CHECKS
+        #region BEHAVIOR CHECKS
         if(isJumping && rb.velocity.y < 0)
         {
             isJumping = false;
-        } 
+        }
+        if(isHanging && !canHanging())
+        {
+            isHanging  = false;
+        }
         #endregion
     }
     void FixedUpdate()
     {
         Walk();
-        
         if(jumpInput > 0 && CanJump())
         {
             isJumping = true;
-            Jump(Vector2.up);          
+            Jump(Vector2.up,jumpForce);          
         }
         JumpCut();
+        
+        if(canHanging())
+        {
+            Hanging();
+        }
+
+        #region DEBUG LOG
+        Debug.Log("isHanging = " + isHanging);
+        #endregion
     }
 
     #region BEHAVIOR
@@ -96,21 +110,29 @@ public class Player_movement : MonoBehaviour
         float movement = Mathf.Pow(Mathf.Abs(speedDif)*accelRate , velPower) * Mathf.Sign(speedDif);
         rb.AddForce(movement * Vector2.right);
     }
-    void Jump(Vector2 dir)//점프한다
+    void Jump(Vector2 dir,float force)//점프한다
     {
-        float force = jumpForce;
 	    if (rb.velocity.y < 0)
         {
             force -= rb.velocity.y;
         }
         rb.AddForce(dir * force,ForceMode2D.Impulse);
     }
+    void Hanging()
+    {
+        isHanging = true;
+        rb.AddForce(new Vector2(rb.velocity.x, (rb.velocity.y * -1) + HangingMultiplier), ForceMode2D.Impulse);
+    }
     #endregion
 
     #region ACTIONABLE
+    private bool canHanging()
+    {
+        return pCollider.onLedge && !pCollider.onGround && pInput.movementInput.x==pCollider.wallSide;
+    }
     public bool CanJump()
     {
-        return LastOnGroundTime > 0 && !isJumping;
+        return (LastOnGroundTime > 0 && !isJumping);
     }
     private bool CanJumpCut()
     {
@@ -121,14 +143,7 @@ public class Player_movement : MonoBehaviour
     void JumpGravtity()//낙하가속
     {
         float gravityScale=1;
-        if(rb.velocity.y < 0)
-        {
-            rb.gravityScale = gravityScale * 2;
-        }
-        else
-        {
-            rb.gravityScale = gravityScale;
-        }
+        rb.gravityScale = rb.velocity.y < 0 ? gravityScale * 2 : gravityScale;
     }
     void JumpCut()//길게 누르면 더 높게점프
     { 
