@@ -30,6 +30,7 @@ public class Player_movement : MonoBehaviour
     public float acceleration = 4;
     public float decceleration = 5;
     public float jumpForce;
+    public float ledgeUpForce;
     [Range(0, 1)] public float jumpCutMultiplier;
     [Range(0, 0.5f)] public float coyoteTime;
     [Range(0, 1)] public float HangingMultiplier;
@@ -92,11 +93,14 @@ public class Player_movement : MonoBehaviour
         
         if(canHanging())
         {
-            Hanging();
+            LedgeHanging();
         }
-
+        if(isHanging&&jumpInput>0)
+        {
+            LedgeUp();
+        }
         #region DEBUG LOG
-        Debug.Log("isHanging = " + isHanging);
+        Debug.Log("moveInput = " + moveInput);
         #endregion
     }
 
@@ -118,17 +122,23 @@ public class Player_movement : MonoBehaviour
         }
         rb.AddForce(dir * force,ForceMode2D.Impulse);
     }
-    void Hanging()
+    void LedgeHanging()
     {
         isHanging = true;
         rb.AddForce(new Vector2(rb.velocity.x, (rb.velocity.y * -1) + HangingMultiplier), ForceMode2D.Impulse);
+    }
+    void LedgeUp() 
+    {
+        isJumping = false;
+        isHanging = false;
+        Jump(Vector2.up,ledgeUpForce);
     }
     #endregion
 
     #region ACTIONABLE
     private bool canHanging()
     {
-        return pCollider.onLedge && !pCollider.onGround && pInput.movementInput.x==pCollider.wallSide;
+        return pCollider.onLedge && !pCollider.onGround && ((pInput.movementInput.x>0) == (pCollider.wallSide>0));
     }
     public bool CanJump()
     {
