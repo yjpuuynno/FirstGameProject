@@ -59,7 +59,6 @@ public class Player_movement : MonoBehaviour
         #endregion
 
         #region PHYSICS CHECKS
-        //Player_colider.cs
         if(pCollider.onGround)
         {
             LastOnGroundTime = coyoteTime; 
@@ -68,6 +67,10 @@ public class Player_movement : MonoBehaviour
 
         #region GRAVITY CHECKS
         JumpGravtity();
+        #endregion
+
+        #region STATUS CHECKS
+        
         #endregion
 
         #region BEHAVIOR CHECKS
@@ -89,6 +92,7 @@ public class Player_movement : MonoBehaviour
             isJumping = true;
             Jump(Vector2.up,jumpForce);          
         }
+
         JumpCut();
         
         if(canHanging())
@@ -100,7 +104,6 @@ public class Player_movement : MonoBehaviour
             LedgeUp();
         }
         #region DEBUG LOG
-        Debug.Log("moveInput = " + moveInput);
         #endregion
     }
 
@@ -131,6 +134,7 @@ public class Player_movement : MonoBehaviour
     {
         isJumping = false;
         isHanging = false;
+        Debug.Log("do LedgeUp");
         Jump(Vector2.up,ledgeUpForce);
     }
     #endregion
