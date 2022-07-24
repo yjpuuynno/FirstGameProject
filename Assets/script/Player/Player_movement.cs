@@ -117,7 +117,7 @@ public class Player_movement : MonoBehaviour
         float movement = Mathf.Pow(Mathf.Abs(speedDif)*accelRate , velPower) * Mathf.Sign(speedDif);
         rb.AddForce(movement * Vector2.right);
     }
-    void Jump(Vector2 dir,float force)//점프한다
+    void Jump(Vector2 dir,float force)
     {
 	    if (rb.velocity.y < 0)
         {
@@ -128,6 +128,7 @@ public class Player_movement : MonoBehaviour
     void LedgeHanging()
     {
         isHanging = true;
+        rb.velocity = Vector2.zero;
         rb.AddForce(new Vector2(rb.velocity.x, (rb.velocity.y * -1) + HangingMultiplier), ForceMode2D.Impulse);
     }
     void LedgeUp() 
@@ -154,7 +155,7 @@ public class Player_movement : MonoBehaviour
     }
     #endregion
 
-    void JumpGravtity()//낙하가속
+    void JumpGravtity()//낙하할때 중력 스케일 증가
     {
         float gravityScale=1;
         rb.gravityScale = rb.velocity.y < 0 ? gravityScale * 2 : gravityScale;

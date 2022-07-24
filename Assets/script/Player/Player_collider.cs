@@ -8,9 +8,6 @@ public class Player_collider : MonoBehaviour
     public Transform groundChkPos;
     public Transform LedgeChkPos;
     public float distance;
-    public float groundAngle;
-    public Vector2 perp;
-    public Vector2 groundVector;
     public LayerMask groundLayer;
     public float wallSide;
 #region COLLIDER_BOOL
@@ -66,38 +63,6 @@ public class Player_collider : MonoBehaviour
             Debug.DrawLine(LedgeChkPos.position,hit.point,Color.red);
         } 
     }
-    /*
-    RaycastHit2D GroundRayHit()
-    {
-        RaycastHit2D hit;
-        RaycastHit2D hitDown = Physics2D.Raycast(groundChkPos.position,Vector2.down,distance,groundLayer);
-        RaycastHit2D hitRight = Physics2D.Raycast(groundChkPos.position,Vector2.right,distance,groundLayer);
-        RaycastHit2D hitLeft = Physics2D.Raycast(groundChkPos.position,Vector2.left,distance,groundLayer);
-        if(hitRight){
-            hit = hitRight;
-        }else if(hitLeft)
-        {
-            hit = hitLeft;
-        }else
-        {
-            hit = hitDown;
-        }
-        return hit;
-    }
-    void ChkGroundAngle(RaycastHit2D hit)
-    {
-        groundAngle = Vector2.Angle(hit.normal,Vector2.up);
-        groundVector = Vector2.Reflect(hit.normal,Vector2.up);
-        perp = Vector2.Perpendicular(hit.normal).normalized;
-        if(onGround)
-        {
-        Debug.DrawLine(hit.point,hit.point+hit.normal,Color.green);
-        Debug.DrawLine(hit.point,hit.point+perp,Color.green);
-        Debug.DrawLine(groundChkPos.position,hit.point,Color.blue); 
-        }
-        
-    }
-    */
     void contactChk()
     {
         onGround = Physics2D.OverlapBox((Vector2)transform.position + bottomOffset,bottomSize,0,groundLayer);
