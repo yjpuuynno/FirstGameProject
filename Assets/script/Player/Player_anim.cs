@@ -7,6 +7,7 @@ public class Player_anim : MonoBehaviour
     private Animator animator;
     private Player_movement player_Movement;
     private Player_input player_Input;
+    private Player_collider player_Collider;
     private Rigidbody2D rb; 
     // Start is called before the first frame update
     void Start()
@@ -14,6 +15,8 @@ public class Player_anim : MonoBehaviour
         animator = GetComponent<Animator>();
         player_Movement = GetComponent<Player_movement>();
         player_Input = GetComponent<Player_input>();
+        player_Collider = GetComponent<Player_collider>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
@@ -22,8 +25,10 @@ public class Player_anim : MonoBehaviour
         if(player_Input.movementInput.x != 0)
         {
             Flip();
-            animator.SetFloat("Speed",Mathf.Abs(player_Input.movementInput.x));
         }
+        animator.SetFloat("Speed",Mathf.Abs(player_Input.movementInput.x));
+        animator.SetFloat("OnAir",rb.velocity.y);
+        animator.SetBool("onGround", player_Collider.onGround);
     }
     void Flip()
     {

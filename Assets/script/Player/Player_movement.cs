@@ -95,14 +95,6 @@ public class Player_movement : MonoBehaviour
 
         JumpCut();
         
-        if(canHanging())
-        {
-            LedgeHanging();
-        }
-        if(isHanging&&jumpInput>0)
-        {
-            LedgeUp();
-        }
         #region DEBUG LOG
         #endregion
     }
@@ -129,14 +121,9 @@ public class Player_movement : MonoBehaviour
     {
         isHanging = true;
         rb.velocity = Vector2.zero;
-        rb.AddForce(new Vector2(rb.velocity.x, (rb.velocity.y * -1) + HangingMultiplier), ForceMode2D.Impulse);
     }
     void LedgeUp() 
     {
-        isJumping = false;
-        isHanging = false;
-        Debug.Log("do LedgeUp");
-        Jump(Vector2.up,ledgeUpForce);
     }
     #endregion
 
