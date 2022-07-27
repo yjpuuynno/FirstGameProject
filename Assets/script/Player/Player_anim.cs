@@ -26,7 +26,7 @@ public class Player_anim : MonoBehaviour
         {
             Flip();
         }
-        animator.SetFloat("Speed",Mathf.Abs(player_Input.movementInput.x));
+        animator.SetFloat("Speed",Mathf.Abs(rb.velocity.x));
         animator.SetFloat("OnAir",rb.velocity.y);
         animator.SetBool("onGround", player_Collider.onGround);
     }

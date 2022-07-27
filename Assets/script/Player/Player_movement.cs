@@ -16,7 +16,8 @@ public class Player_movement : MonoBehaviour
     #endregion
 
     #region INPUT PARAMETERS
-	public float LastPressedJumpTime { get; private set; }
+	public float LastPressedJumpTime; //{ get; private set; }
+    public float LastPressedWalkTime; //{ get; private set; }
 	#endregion
 
     [Space]
@@ -30,15 +31,11 @@ public class Player_movement : MonoBehaviour
     public float acceleration = 4;
     public float decceleration = 5;
     public float jumpForce;
-    public float ledgeUpForce;
     [Range(0, 1)] public float jumpCutMultiplier;
     [Range(0, 0.5f)] public float coyoteTime;
+    [Range(1f, 5f)] public float runingStartTime;
     [Range(0, 1)] public float HangingMultiplier;
 
-    [Space]
-    [Header("const")]
-    const int minimumJumpForce = 1;
-    const float defaultJumpForce = 2;
     // Start is called before the first frame update
     void Start()
     {
@@ -56,12 +53,17 @@ public class Player_movement : MonoBehaviour
 
         #region TIMERS
         LastOnGroundTime-=Time.deltaTime;
+        LastPressedWalkTime-=Time.deltaTime;
         #endregion
 
         #region PHYSICS CHECKS
         if(pCollider.onGround)
         {
             LastOnGroundTime = coyoteTime; 
+        }
+        if(Mathf.Abs(rb.velocity.x) < 0.1f )
+        {
+            LastPressedWalkTime = runingStartTime;
         }
         #endregion
 
@@ -102,6 +104,9 @@ public class Player_movement : MonoBehaviour
     #region BEHAVIOR
     void Walk()//걷는다
     {
+        float walkingSpeed = 2.5f;
+        float runingSpeed = walkingSpeed * walkingSpeed;
+        moveSpeed = CanRuning() ? runingSpeed : walkingSpeed;
         float velPower = 1f;
         float pSpeed = moveInput * moveSpeed;
         float speedDif = pSpeed - rb.velocity.x;
@@ -134,11 +139,15 @@ public class Player_movement : MonoBehaviour
     }
     public bool CanJump()
     {
-        return (LastOnGroundTime > 0 && !isJumping);
+        return LastOnGroundTime > 0 && !isJumping;
     }
     private bool CanJumpCut()
     {
 		return isJumping && rb.velocity.y > 0;
+    }
+    private bool CanRuning()
+    {
+        return LastPressedWalkTime < 0;
     }
     #endregion
 
