@@ -16,8 +16,8 @@ public class Player_movement : MonoBehaviour
     #endregion
 
     #region INPUT PARAMETERS
-	public float LastPressedJumpTime; //{ get; private set; }
-    public float LastPressedWalkTime; //{ get; private set; }
+	public float LastPressedJumpTime;
+    public float LastPressedWalkTime;
 	#endregion
 
     [Space]
@@ -34,8 +34,6 @@ public class Player_movement : MonoBehaviour
     [Range(0, 1)] public float jumpCutMultiplier;
     [Range(0, 0.5f)] public float coyoteTime;
     [Range(1f, 5f)] public float runingStartTime;
-    [Range(0, 1)] public float HangingMultiplier;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -54,6 +52,7 @@ public class Player_movement : MonoBehaviour
         #region TIMERS
         LastOnGroundTime-=Time.deltaTime;
         LastPressedWalkTime-=Time.deltaTime;
+        LastPressedJumpTime-=Time.deltaTime;
         #endregion
 
         #region PHYSICS CHECKS
@@ -80,16 +79,12 @@ public class Player_movement : MonoBehaviour
         {
             isJumping = false;
         }
-        if(isHanging && !canHanging())
-        {
-            isHanging  = false;
-        }
         #endregion
     }
     void FixedUpdate()
     {
         Walk();
-        if(jumpInput > 0 && CanJump())
+        if(CanJump())
         {
             isJumping = true;
             Jump(Vector2.up,jumpForce);          
@@ -129,17 +124,18 @@ public class Player_movement : MonoBehaviour
     }
     void LedgeUp() 
     {
+        
     }
     #endregion
 
     #region ACTIONABLE
     private bool canHanging()
     {
-        return pCollider.onLedge && !pCollider.onGround && ((pInput.movementInput.x>0) == (pCollider.wallSide>0));
+        return false;
     }
     public bool CanJump()
     {
-        return LastOnGroundTime > 0 && !isJumping;
+        return jumpInput > 0 && LastOnGroundTime > 0 && !isJumping;
     }
     private bool CanJumpCut()
     {

@@ -5,9 +5,8 @@ using UnityEngine;
 public class Player_collider : MonoBehaviour
 {
     // Start is called before the first frame update
-    public Transform groundChkPos;
     public Transform LedgeChkPos;
-    public float distance;
+
     public LayerMask groundLayer;
     public float wallSide;
 #region COLLIDER_BOOL
@@ -22,6 +21,7 @@ public class Player_collider : MonoBehaviour
     public Vector2 bottomOffset;
     public Vector2 rightOffset;
     public Vector2 leftOffset;
+    public Vector2 LedgeRayBottomOffset;
 #endregion
 
     public Vector2 bottomSize;
@@ -39,29 +39,20 @@ public class Player_collider : MonoBehaviour
     void FixedUpdate()
     {
         contactChk();
-        //ChkGroundAngle(GroundRayHit());
-        ChkLedge(LedgeRayHit());
-        onLedge = onWall && !LedgeRayHit();
-    }
-    RaycastHit2D LedgeRayHit()
-    {
-        RaycastHit2D hit;
-        RaycastHit2D hitRight = Physics2D.Raycast(LedgeChkPos.position,Vector2.right,distance+0.5f,groundLayer);
-        RaycastHit2D hitLeft = Physics2D.Raycast(LedgeChkPos.position,Vector2.left,distance+0.5f,groundLayer);
-        if(hitRight){
-            hit = hitRight;
-        }else 
+        onLedge = LedgeRayHit();
+        if(LedgeRayHit())
         {
-            hit = hitLeft;
+            Debug.Log("can Up");
         }
-        return hit;
     }
-    void ChkLedge(RaycastHit2D hit)
+    bool LedgeRayHit()
     {
-        if(onWall && !onGround && hit)
-        {
-            Debug.DrawLine(LedgeChkPos.position,hit.point,Color.red);
-        } 
+        RaycastHit2D onLedgeChkMid = Physics2D.Raycast((Vector2)LedgeChkPos.position,Vector2.right * wallSide, wallDistance, groundLayer);
+        RaycastHit2D onLedgeChkBottom = Physics2D.Raycast((Vector2)LedgeChkPos.position + LedgeRayBottomOffset, Vector2.right * wallSide, wallDistance, groundLayer);
+
+        Debug.DrawLine((Vector2)LedgeChkPos.position, (Vector2)LedgeChkPos.position + new Vector2(wallDistance * wallSide,0), Color.red);
+        Debug.DrawLine((Vector2)LedgeChkPos.position + LedgeRayBottomOffset, (Vector2)LedgeChkPos.position + new Vector2(wallDistance * wallSide,LedgeRayBottomOffset.y),Color.green);
+        return !onLedgeChkMid && onLedgeChkBottom;
     }
     void contactChk()
     {
