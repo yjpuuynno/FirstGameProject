@@ -40,10 +40,7 @@ public class Player_collider : MonoBehaviour
     {
         contactChk();
         onLedge = LedgeRayHit();
-        if(LedgeRayHit())
-        {
-            Debug.Log("can Up");
-        }
+        LedgeRayHit();
     }
     bool LedgeRayHit()
     {

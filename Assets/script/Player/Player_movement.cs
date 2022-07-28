@@ -8,10 +8,12 @@ public class Player_movement : MonoBehaviour
     public Rigidbody2D rb;
     Player_collider pCollider;
     Player_input pInput;
+    private Animator animator;
 
     #region STATE PARAMETERS
     public bool isJumping { get; private set; }
     public bool isHanging { get; private set; }
+    public bool isLedgeClimb { get; private set; }
     public float LastOnGroundTime { get; private set; }
     #endregion
 
@@ -40,6 +42,8 @@ public class Player_movement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         pCollider = GetComponent<Player_collider>();
         pInput = GetComponent<Player_input>();
+        animator = GetComponent<Animator>();
+
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
@@ -67,7 +71,7 @@ public class Player_movement : MonoBehaviour
         #endregion
 
         #region GRAVITY CHECKS
-        JumpGravtity();
+        //JumpGravtity();
         #endregion
 
         #region STATUS CHECKS
@@ -83,13 +87,20 @@ public class Player_movement : MonoBehaviour
     }
     void FixedUpdate()
     {
-        Walk();
-        if(CanJump())
+        if(CanMove())
         {
-            isJumping = true;
-            Jump(Vector2.up,jumpForce);          
+            Walk();
+            if(CanJump())
+            {
+                isJumping = true;
+                Jump(Vector2.up,jumpForce);          
+            }
+            if(CanLedgeClimb())
+            {
+                StartCoroutine(LedgeClimb());
+            }
         }
-
+        
         JumpCut();
         
         #region DEBUG LOG
@@ -117,21 +128,22 @@ public class Player_movement : MonoBehaviour
         }
         rb.AddForce(dir * force,ForceMode2D.Impulse);
     }
-    void LedgeHanging()
+    IEnumerator LedgeClimb()//2번 호출 할 수 있는 버그가 있다
     {
-        isHanging = true;
+        isLedgeClimb=true;
         rb.velocity = Vector2.zero;
-    }
-    void LedgeUp() 
-    {
-        
+        rb.gravityScale = 0;
+        yield return new WaitForSecondsRealtime(animator.GetCurrentAnimatorStateInfo(0).length);
+        transform.position = new Vector2(transform.position.x + (0.43f * pCollider.wallSide),transform.position.y + 1.932f);
+        rb.gravityScale = 1;
+        isLedgeClimb=false;
     }
     #endregion
 
     #region ACTIONABLE
-    private bool canHanging()
+    private bool CanMove()
     {
-        return false;
+        return !isLedgeClimb;
     }
     public bool CanJump()
     {
@@ -144,6 +156,10 @@ public class Player_movement : MonoBehaviour
     private bool CanRuning()
     {
         return LastPressedWalkTime < 0;
+    }
+    private bool CanLedgeClimb()
+    {
+        return pCollider.onLedge && !isLedgeClimb && moveInput != 0 && jumpInput > 0;
     }
     #endregion
 
