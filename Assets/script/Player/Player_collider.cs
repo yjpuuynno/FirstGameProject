@@ -6,8 +6,8 @@ public class Player_collider : MonoBehaviour
 {
     // Start is called before the first frame update
     public Transform LedgeChkPos;
-
     public LayerMask groundLayer;
+    private Player_movement player_Movement;
     public float wallSide;
 #region COLLIDER_BOOL
     public bool onGround;
@@ -28,19 +28,18 @@ public class Player_collider : MonoBehaviour
     [Range(0, 1)] public float wallDistance;
     void Start()
     {
-
+        player_Movement = GetComponent<Player_movement>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        contactChk();
+        onLedge = LedgeRayHit() && !player_Movement.isLedgeClimb;
     }
     void FixedUpdate()
     {
-        contactChk();
-        onLedge = LedgeRayHit();
-        LedgeRayHit();
+        
     }
     bool LedgeRayHit()
     {
@@ -60,7 +59,7 @@ public class Player_collider : MonoBehaviour
         onLeftWall = LeftWall;
         Debug.DrawLine((Vector2)transform.position + rightOffset, (Vector2)transform.position + new Vector2(wallDistance,rightOffset.y),Color.green);
         Debug.DrawLine((Vector2)transform.position + leftOffset, (Vector2)transform.position + new Vector2(wallDistance*-1,leftOffset.y),Color.green);
-        wallSide = onRightWall ? 1 : -1; 
+        wallSide = onLeftWall ? -1 : 1; 
         onWall = onRightWall || onLeftWall;
     }
     void OnDrawGizmos()

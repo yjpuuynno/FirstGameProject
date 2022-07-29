@@ -22,14 +22,15 @@ public class Player_anim : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(player_Input.movementInput.x != 0 && !player_Movement.isLedgeClimb)
-        {
-            Flip();
-        }
+        animator.SetBool("DoLedgeclimb",player_Movement.isLedgeClimb);
         animator.SetFloat("Speed",Mathf.Abs(rb.velocity.x));
         animator.SetFloat("OnAir",rb.velocity.y);
         animator.SetBool("onGround", player_Collider.onGround);
-        animator.SetBool("DoLedgeclimb",player_Movement.isLedgeClimb);    
+        
+        if(player_Input.movementInput.x != 0 && !player_Movement.isLedgeClimb)
+        {
+            Flip();
+        }   
     }
     void Flip()
     {

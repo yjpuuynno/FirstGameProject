@@ -52,7 +52,7 @@ public class Player_movement : MonoBehaviour
     {
         moveInput = pInput.movementInput.x;
         jumpInput = pInput.movementInput.y;
-
+        
         #region TIMERS
         LastOnGroundTime-=Time.deltaTime;
         LastPressedWalkTime-=Time.deltaTime;
@@ -71,7 +71,10 @@ public class Player_movement : MonoBehaviour
         #endregion
 
         #region GRAVITY CHECKS
-        //JumpGravtity();
+        if(CanMove())
+        {
+            SetGravtityScale(1);
+        }
         #endregion
 
         #region STATUS CHECKS
@@ -90,16 +93,17 @@ public class Player_movement : MonoBehaviour
         if(CanMove())
         {
             Walk();
-            if(CanJump())
-            {
-                isJumping = true;
-                Jump(Vector2.up,jumpForce);          
-            }
-            if(CanLedgeClimb())
-            {
-                StartCoroutine(LedgeClimb());
-            }
         }
+        
+        if(CanJump())
+        {
+            isJumping = true;
+            Jump(Vector2.up,jumpForce);          
+        }
+        if(CanLedgeClimb())
+        {
+            StartCoroutine(LedgeClimb());
+        }  
         
         JumpCut();
         
@@ -128,15 +132,19 @@ public class Player_movement : MonoBehaviour
         }
         rb.AddForce(dir * force,ForceMode2D.Impulse);
     }
-    IEnumerator LedgeClimb()//2번 호출 할 수 있는 버그가 있다
+    IEnumerator LedgeClimb()
     {
         isLedgeClimb=true;
         rb.velocity = Vector2.zero;
-        rb.gravityScale = 0;
-        yield return new WaitForSecondsRealtime(animator.GetCurrentAnimatorStateInfo(0).length);
-        transform.position = new Vector2(transform.position.x + (0.43f * pCollider.wallSide),transform.position.y + 1.932f);
-        rb.gravityScale = 1;
-        isLedgeClimb=false;
+        SetGravtityScale(0);
+        yield return new WaitForSeconds(1);
+        if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.LedgeClimb") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+        {
+            SetGravtityScale(1);
+            isLedgeClimb=false;
+            animator.SetBool("DoLedgeclimb",isLedgeClimb);
+            transform.position = new Vector2(transform.position.x + (0.43f * pCollider.wallSide),transform.position.y + 1.932f);
+        }
     }
     #endregion
 
@@ -147,7 +155,7 @@ public class Player_movement : MonoBehaviour
     }
     public bool CanJump()
     {
-        return jumpInput > 0 && LastOnGroundTime > 0 && !isJumping;
+        return CanMove() && (jumpInput > 0) && LastOnGroundTime > 0 && !isJumping;
     }
     private bool CanJumpCut()
     {
@@ -155,18 +163,19 @@ public class Player_movement : MonoBehaviour
     }
     private bool CanRuning()
     {
-        return LastPressedWalkTime < 0;
+        bool input = (moveInput != 0);
+        return CanMove() && input && LastPressedWalkTime < 0;
     }
     private bool CanLedgeClimb()
     {
-        return pCollider.onLedge && !isLedgeClimb && moveInput != 0 && jumpInput > 0;
+        bool input = (pCollider.onGround == (moveInput!=0 && jumpInput > 0)) || (!pCollider.onGround && (moveInput != 0));
+        return CanMove() && input && pCollider.onLedge && !isLedgeClimb && (pCollider.wallSide > 0 == moveInput > 0);
     }
     #endregion
 
-    void JumpGravtity()//낙하할때 중력 스케일 증가
+    void SetGravtityScale(int gravityScale)//중력 스케일 증가
     {
-        float gravityScale=1;
-        rb.gravityScale = rb.velocity.y < 0 ? gravityScale * 2 : gravityScale;
+        rb.gravityScale = gravityScale;
     }
     void JumpCut()//길게 누르면 더 높게점프
     { 
@@ -176,4 +185,23 @@ public class Player_movement : MonoBehaviour
             rb.AddForce(Vector2.down * rb.velocity.y * (1 - jumpCutMultiplier), ForceMode2D.Impulse);
         }
     }
+    #region API
+    /*
+      private float GetAnimLength(string animName)
+    {
+        float time = 0;
+        RuntimeAnimatorController ac = animator.runtimeAnimatorController;
+ 
+        for (int i = 0; i < ac.animationClips.Length; i++)
+        {
+            if (ac.animationClips[i].name == animName)
+            {
+                time = ac.animationClips[i].length;
+            }
+        }
+ 
+        return time;
+    }
+    */
+    #endregion
 }
