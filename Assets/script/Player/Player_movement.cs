@@ -19,17 +19,25 @@ public class Player_movement : MonoBehaviour
 
     #region INPUT PARAMETERS
 	public float LastPressedJumpTime;
-    public float LastPressedWalkTime;
+    public float LastPressedMoveTime;
+    [Range(0, 1)] public float moveInputWaitTime = 0.3f;
 	#endregion
 
     [Space]
     [Header("Input")]
     private float moveInput;
+    bool moveInputDown;
+    bool moveInputUp;
+    private bool moveInputPass;
+    public int moveInputCount = 1;
     private float jumpInput;
+    
 
     [Space]
     [Header("Status")]
-    public float moveSpeed = 5;
+    public float moveSpeed;
+    const float walkingSpeed = 2.5f;
+    const float runingSpeed = 6;
     public float acceleration = 4;
     public float decceleration = 5;
     public float jumpForce;
@@ -51,22 +59,41 @@ public class Player_movement : MonoBehaviour
     void Update()
     {
         moveInput = pInput.movementInput.x;
+        moveInputDown = (moveInput != 0);
+        moveInputUp = (moveInput == 0);
+
         jumpInput = pInput.movementInput.y;
         
         #region TIMERS
         LastOnGroundTime-=Time.deltaTime;
-        LastPressedWalkTime-=Time.deltaTime;
         LastPressedJumpTime-=Time.deltaTime;
+        #endregion
+
+        #region INPUTCOUNT
+
+        if(moveInputUp)
+        {
+            moveInputPass = true;
+        }
+        if(moveInputPass)
+        {
+            if(moveInputDown && (Time.time - LastPressedMoveTime) < moveInputWaitTime)
+            {
+                moveInputCount += 1;
+                moveInputPass = false;
+            }else if(moveInputDown)
+            {
+                moveInputPass = false;
+                LastPressedMoveTime = Time.time;
+                moveInputCount = 1;
+            }
+        }
         #endregion
 
         #region PHYSICS CHECKS
         if(pCollider.onGround)
         {
             LastOnGroundTime = coyoteTime; 
-        }
-        if(Mathf.Abs(rb.velocity.x) < 0.1f )
-        {
-            LastPressedWalkTime = runingStartTime;
         }
         #endregion
 
@@ -114,8 +141,6 @@ public class Player_movement : MonoBehaviour
     #region BEHAVIOR
     void Walk()//걷는다
     {
-        float walkingSpeed = 2.5f;
-        float runingSpeed = walkingSpeed * walkingSpeed;
         moveSpeed = CanRuning() ? runingSpeed : walkingSpeed;
         float velPower = 1f;
         float pSpeed = moveInput * moveSpeed;
@@ -135,16 +160,17 @@ public class Player_movement : MonoBehaviour
     IEnumerator LedgeClimb()
     {
         isLedgeClimb=true;
-        rb.velocity = Vector2.zero;
         SetGravtityScale(0);
+        animator.SetBool("DoLedgeclimb",isLedgeClimb);
+        rb.velocity = Vector2.zero;
         yield return new WaitForSeconds(1);
-        if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.LedgeClimb") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
-        {
-            SetGravtityScale(1);
-            isLedgeClimb=false;
-            animator.SetBool("DoLedgeclimb",isLedgeClimb);
-            transform.position = new Vector2(transform.position.x + (0.43f * pCollider.wallSide),transform.position.y + 1.932f);
-        }
+        //if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.LedgeClimb") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+        //{
+        isLedgeClimb=false;
+        SetGravtityScale(1);
+        animator.SetBool("DoLedgeclimb",isLedgeClimb);
+        transform.position = new Vector2(transform.position.x + (0.43f * pCollider.wallSide),transform.position.y + 1.932f);
+        //}
     }
     #endregion
 
@@ -155,7 +181,8 @@ public class Player_movement : MonoBehaviour
     }
     public bool CanJump()
     {
-        return CanMove() && (jumpInput > 0) && LastOnGroundTime > 0 && !isJumping;
+        bool input = (jumpInput > 0);
+        return CanMove() && input && LastOnGroundTime > 0 && !isJumping;
     }
     private bool CanJumpCut()
     {
@@ -163,16 +190,14 @@ public class Player_movement : MonoBehaviour
     }
     private bool CanRuning()
     {
-        bool input = (moveInput != 0);
-        return CanMove() && input && LastPressedWalkTime < 0;
+        return CanMove() && moveInputCount > 1;
     }
     private bool CanLedgeClimb()
     {
-        bool input = (pCollider.onGround == (moveInput!=0 && jumpInput > 0)) || (!pCollider.onGround && (moveInput != 0));
-        return CanMove() && input && pCollider.onLedge && !isLedgeClimb && (pCollider.wallSide > 0 == moveInput > 0);
+        bool input = (moveInputUp && jumpInput > 0);
+        return CanMove() && input && pCollider.onLedge && (pCollider.wallSide > 0 == moveInput > 0) && !isLedgeClimb;
     }
     #endregion
-
     void SetGravtityScale(int gravityScale)//중력 스케일 증가
     {
         rb.gravityScale = gravityScale;
