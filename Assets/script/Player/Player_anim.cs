@@ -23,7 +23,8 @@ public class Player_anim : MonoBehaviour
     void Update()
     {
         animator.SetBool("DoLedgeclimb",player_Movement.isLedgeClimb);
-        animator.SetFloat("Speed",Mathf.Abs(rb.velocity.x));
+        float speedFloat = player_Input.movementInput.x != 0 ? Mathf.Abs(rb.velocity.x) : 0;
+        animator.SetFloat("Speed",speedFloat);
         animator.SetFloat("OnAir",rb.velocity.y);
         animator.SetBool("onGround", player_Collider.onGround);
         

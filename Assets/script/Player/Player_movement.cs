@@ -31,6 +31,8 @@ public class Player_movement : MonoBehaviour
     private bool moveInputPass;
     public int moveInputCount = 1;
     private float jumpInput;
+    private bool jumpInputUp;
+    private bool jumpInputDown;
     
 
     [Space]
@@ -63,7 +65,8 @@ public class Player_movement : MonoBehaviour
         moveInputUp = (moveInput == 0);
 
         jumpInput = pInput.movementInput.y;
-        
+        jumpInputDown = (jumpInput > 0);
+        jumpInputUp = (jumpInput == 0);
         #region TIMERS
         LastOnGroundTime-=Time.deltaTime;
         LastPressedJumpTime-=Time.deltaTime;
@@ -124,7 +127,6 @@ public class Player_movement : MonoBehaviour
         
         if(CanJump())
         {
-            isJumping = true;
             Jump(Vector2.up,jumpForce);          
         }
         if(CanLedgeClimb())
@@ -151,6 +153,7 @@ public class Player_movement : MonoBehaviour
     }
     void Jump(Vector2 dir,float force)
     {
+        isJumping = true;
 	    if (rb.velocity.y < 0)
         {
             force -= rb.velocity.y;
@@ -159,7 +162,7 @@ public class Player_movement : MonoBehaviour
     }
     IEnumerator LedgeClimb()
     {
-        isLedgeClimb=true;
+        isLedgeClimb = true;
         SetGravtityScale(0);
         animator.SetBool("DoLedgeclimb",isLedgeClimb);
         rb.velocity = Vector2.zero;
@@ -181,7 +184,7 @@ public class Player_movement : MonoBehaviour
     }
     public bool CanJump()
     {
-        bool input = (jumpInput > 0);
+        bool input = (jumpInputDown);
         return CanMove() && input && LastOnGroundTime > 0 && !isJumping;
     }
     private bool CanJumpCut()
@@ -190,11 +193,11 @@ public class Player_movement : MonoBehaviour
     }
     private bool CanRuning()
     {
-        return CanMove() && moveInputCount > 1;
+        return CanMove() && (moveInputCount > 1 || pInput.sprintInput != 0);
     }
     private bool CanLedgeClimb()
     {
-        bool input = (moveInputUp && jumpInput > 0);
+        bool input = (moveInputDown && jumpInputDown);
         return CanMove() && input && pCollider.onLedge && (pCollider.wallSide > 0 == moveInput > 0) && !isLedgeClimb;
     }
     #endregion

@@ -30,16 +30,10 @@ public class Player_collider : MonoBehaviour
     {
         player_Movement = GetComponent<Player_movement>();
     }
-
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         contactChk();
         onLedge = LedgeRayHit() && !player_Movement.isLedgeClimb;
-    }
-    void FixedUpdate()
-    {
-        
     }
     bool LedgeRayHit()
     {

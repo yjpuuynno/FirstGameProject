@@ -7,11 +7,19 @@ public class Player_input : MonoBehaviour
 {
     public static Player_input instance;
     private InputHandler controls;
-
-    public Vector2 movementInput { get; private set; }
-
+    
+    #region ACTION
     [SerializeField]
     private InputActionReference movement;
+    [SerializeField]
+    private InputActionReference sprint;
+    #endregion
+
+    #region InputValue
+    public Vector2 movementInput { get; private set; }
+    public float sprintInput { get; private set; }
+    #endregion
+    
     // Start is called before the first frame update
     void Awake() 
     {
@@ -26,6 +34,8 @@ public class Player_input : MonoBehaviour
     void Update()
     {
         movementInput = movement.action.ReadValue<Vector2>();
+        sprintInput = sprint.action.ReadValue<float>();
+        Debug.Log(sprintInput);
     }
 
     #region Events
