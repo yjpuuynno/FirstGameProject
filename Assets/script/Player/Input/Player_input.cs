@@ -35,7 +35,6 @@ public class Player_input : MonoBehaviour
     {
         movementInput = movement.action.ReadValue<Vector2>();
         sprintInput = sprint.action.ReadValue<float>();
-        Debug.Log(sprintInput);
     }
 
     #region Events
